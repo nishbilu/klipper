@@ -4,8 +4,7 @@
 #
 # This file may be distributed under the terms of the GNU GPLv3 license.
 import logging
-import stepper
-from . import idex_modes
+import stepper, idex_modes
 
 # The hybrid-corexz kinematic is also known as Markforged kinematics
 class HybridCoreXZKinematics:
@@ -18,9 +17,9 @@ class HybridCoreXZKinematics:
                        stepper.LookupMultiRail(config.getsection('stepper_z'))]
         self.rails[2].get_endstops()[0][0].add_stepper(
             self.rails[0].get_steppers()[0])
-        self.rails[0].setup_itersolve('corexz_stepper_alloc', b'-')
-        self.rails[1].setup_itersolve('cartesian_stepper_alloc', b'y')
-        self.rails[2].setup_itersolve('cartesian_stepper_alloc', b'z')
+        self.rails[0].setup_itersolve('corexz_stepper_alloc', '-')
+        self.rails[1].setup_itersolve('cartesian_stepper_alloc', 'y')
+        self.rails[2].setup_itersolve('cartesian_stepper_alloc', 'z')
         ranges = [r.get_range() for r in self.rails]
         self.axes_min = toolhead.Coord(*[r[0] for r in ranges], e=0.)
         self.axes_max = toolhead.Coord(*[r[1] for r in ranges], e=0.)
@@ -33,15 +32,15 @@ class HybridCoreXZKinematics:
             self.rails.append(stepper.PrinterRail(dc_config))
             self.rails[2].get_endstops()[0][0].add_stepper(
                 self.rails[3].get_steppers()[0])
-            self.rails[3].setup_itersolve('cartesian_stepper_alloc', b'z')
+            self.rails[3].setup_itersolve('cartesian_stepper_alloc', 'z')
             dc_rail_0 = idex_modes.DualCarriagesRail(
                 self.printer, self.rails[0], axis=0, active=True,
-                stepper_alloc_active=('corexz_stepper_alloc', b'-'),
-                stepper_alloc_inactive=('cartesian_reverse_stepper_alloc',b'z'))
+                stepper_alloc_active=('corexz_stepper_alloc','-'),
+                stepper_alloc_inactive=('cartesian_reverse_stepper_alloc','z'))
             dc_rail_1 = idex_modes.DualCarriagesRail(
                 self.printer, self.rails[3], axis=0, active=False,
-                stepper_alloc_active=('corexz_stepper_alloc', b'+'),
-                stepper_alloc_inactive=('cartesian_stepper_alloc', b'z'))
+                stepper_alloc_active=('corexz_stepper_alloc','+'),
+                stepper_alloc_inactive=('cartesian_stepper_alloc','z'))
             self.dc_module = idex_modes.DualCarriages(self.printer,
                         dc_rail_0, dc_rail_1, axis=0)
         for s in self.get_steppers():
@@ -66,11 +65,7 @@ class HybridCoreXZKinematics:
         else:
             return [pos[0] + pos[2], pos[1], pos[2]]
     def update_limits(self, i, range):
-        l, h = self.limits[i]
-        # Only update limits if this axis was already homed,
-        # otherwise leave in un-homed state.
-        if l <= h:
-            self.limits[i] = range
+        self.limits[i] = range
     def override_rail(self, i, rail):
         self.rails[i] = rail
     def set_position(self, newpos, homing_axes):

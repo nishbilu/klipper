@@ -1,12 +1,11 @@
-# Pressure advance
-
 This document provides information on tuning the "pressure advance"
 configuration variable for a particular nozzle and filament. The
 pressure advance feature can be helpful in reducing ooze. For more
 information on how pressure advance is implemented see the
 [kinematics](Kinematics.md) document.
 
-## Tuning pressure advance
+Tuning pressure advance
+=======================
 
 Pressure advance does two useful things - it reduces ooze during
 non-extrude moves and it reduces blobbing during cornering. This guide
@@ -84,7 +83,8 @@ the configuration file and issue a RESTART command. The RESTART
 command will clear the test state and return the acceleration and
 cornering speeds to their normal values.
 
-## Important Notes
+Important Notes
+===============
 
 * The pressure advance value is dependent on the extruder, the nozzle,
   and the filament. It is common for filament from different

@@ -12,10 +12,14 @@ class GCodeButton:
         self.pin = config.get('pin')
         self.last_state = 0
         buttons = self.printer.load_object(config, "buttons")
-        if config.get('analog_range', None) is None:
+        analog_range = config.get('analog_range', None)
+        if analog_range is None:
             buttons.register_buttons([self.pin], self.button_callback)
         else:
-            amin, amax = config.getfloatlist('analog_range', count=2)
+            try:
+                amin, amax = map(float, analog_range.split(','))
+            except:
+                raise config.error("Unable to parse analog_range")
             pullup = config.getfloat('analog_pullup_resistor', 4700., above=0.)
             buttons.register_adc_button(self.pin, amin, amax, pullup,
                                         self.button_callback)
